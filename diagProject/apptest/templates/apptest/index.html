@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Création de diagramme</title>
+    <link rel="stylesheet" href="{% static 'apptest/css/style.css' %}">
+    <!-- Ajoutez cette balise script dans la section head de votre fichier index.html -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl7/6en8XCp+HHAAK5GSLf2xlYtvJ8U2Q4U+9cuEnJoa3" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 400px;
+            max-width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Créer une carte mentale</h1>
+    <form method="post" action="{% url 'create_diagram' %}">
+        {% csrf_token %}
+        <label for="theme">Thème :</label>
+        <input type="text" name="theme" id="theme" required>
+        <br>
+        <label for="schema_type">Type de schéma :</label>
+        <select name="schema_type" id="schema_type" required>
+            <option value="">Sélectionnez un type</option>
+            <option value="mind_map">Carte mentale</option>
+            <option value="hierarchical">Hiérarchique</option>
+            <!-- Ajoutez d'autres options de type de schéma ici -->
+        </select>
+        <br>
+        <input type="submit" value="Générer la carte">
+    </form>
+    <div id="body"></div>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="{% static 'apptest/js/main.js' %}"></script>
+
+    <script>
+        function generateDiagram() {
+            const prompt = document.getElementById('prompt').value;
+            if (prompt) {
+                // Envoi d'une requête AJAX à votre serveur Django pour générer le diagramme
+                $.ajax({
+                    url: '/mon_application/generate_diagram/', // Remplacez 'mon_application' par le chemin correct de votre application Django
+                    method: 'POST',
+                    data: JSON.stringify({ 'prompt': prompt }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.diagram_data) {
+                            // Affichez le diagramme généré sur une autre page ou dans une zone spécifique de la page actuelle
+                            console.log("Diagram data: ", response.diagram_data);
+                        } else {
+                            alert("Une erreur s'est produite lors de la génération du diagramme.");
+                        }
+                    },
+                    error: function (error) {
+                        console.error(error);
+                        alert("Une erreur s'est produite lors de la communication avec le serveur.");
+                    }
+                });
+            } else {
+                alert("Veuillez entrer un prompt valide.");
+            }
+        }
+    </script>
+</body>
+</html>

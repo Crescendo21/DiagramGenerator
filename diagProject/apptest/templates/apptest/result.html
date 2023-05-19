@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindmap Example</title>
+    <link rel="stylesheet" href="{% static 'apptest/css/custom-style.css' %}">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div id="body"></div>
+
+    <script>
+        // Fonction pour charger le fichier JSON généré
+        async function loadJsonData(url) {
+            const response = await fetch(url);
+            if (response.ok) {
+                return await response.json();
+            } else {
+                throw new Error(`Could not fetch data from ${url}`);
+            }
+        }
+
+        // Chargement du fichier JSON généré et affichage de la mind map
+        (async function () {
+            try {
+                const mindmapData = {{ json_data|safe }};
+
+                // Chargement du script personnalisé
+                const customScript = await import("{% static 'apptest/js/custom-script.js' %}");
+
+                // Exécution du script personnalisé avec les données de la mind map
+                customScript.update(mindmapData);
+            } catch (error) {
+                console.error("Failed to load JSON data or custom script:", error);
+            }
+        })();
+    </script>
+</body>
+</html>
